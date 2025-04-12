@@ -7,7 +7,7 @@ library(zoo)
 library(forecast)
 library(tseries)
 
-
+#PART I: The Data
 # Read CSV file manually (without readr or other libraries)
 data_raw <- read.csv(
   "/home/onyxia/work/Time_Series/valeurs_mensuelles.csv",
@@ -80,3 +80,21 @@ print(results)
 #LogDiff       0.0100000 2.762987e-03
 #Only Differenced and LogDiff are significantly not stationary.
 #Since LogDiff has the smallest variance, we will work with this one
+
+
+
+#PART II: 
+# Plot ACF and PACF to check autocorrelation
+par(mfrow = c(1, 2))
+
+acf(logdiff_ts, main = "ACF of Log-Differenced Series")
+pacf(logdiff_ts, main = "PACF of Log-Differenced Series")
+
+# Auto ARIMA model selection
+auto_model <- auto.arima(logdiff_ts)
+
+# Display the chosen ARMA model
+summary(auto_model)
+
+# Check residuals for validity (should resemble white noise)
+checkresiduals(auto_model)
