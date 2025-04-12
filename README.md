@@ -16,6 +16,7 @@ sector of the industry and containing at least 100 observations. You can use ano
 
 ## Data Description
 The data we downloaded was titled: "Indice CVS-CJO de la production industrielle (base 100 en 2021) - Industrie pharmaceutique (NAF rév. 2, niveau division, poste 21)  Identifiant 010767832"
+https://www.insee.fr/fr/statistiques/serie/010767832 
 
 It is a monthly time series of the pharmaceutical industry production index in Metropolitan France, seasonally and working-day adjusted, base 100 in 2021, and identified by INSEE as 010767832.
 
