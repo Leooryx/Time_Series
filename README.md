@@ -1,7 +1,8 @@
 # Time_Series
 
 
-# Introduction
+# Content of the repository
+The code is provided in **homework** and the **report** file contains the analysis of the code's outputs.
 
 Our code was made on VS Code for Python-R-Julia, provided by Onyxia. 
 
