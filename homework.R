@@ -10,12 +10,13 @@ library(tseries)
 #PART I: The Data
 # Read CSV file manually (without readr or other libraries)
 data_raw <- read.csv(
-  "/home/onyxia/work/Time_Series/valeurs_mensuelles.csv",
+  "/home/onyxia/Time_Series/valeurs_mensuelles.csv",
   sep = ";",         # Use semicolon as separator
   header = FALSE,    # Skip the header row
   skip = 4,          # Skip the first 4 rows (metadata)
   stringsAsFactors = FALSE
 )
+
 
 # Clean and transform the data
 data <- data_raw %>% 
@@ -98,3 +99,18 @@ summary(auto_model)
 
 # Check residuals for validity (should resemble white noise)
 checkresiduals(auto_model)
+
+# Part III: Prediction
+# Forecast the next 12 months with 95% confidence level
+forecast_horizon <- 12
+pred <- forecast(auto_model, h = forecast_horizon, level = 95)
+
+par(mfrow = c(1, 1))
+# Plot the forecast with confidence intervals
+plot(pred,
+     main = "Forecast with 95% Confidence Interval",
+     xlab = "Time",
+     ylab = "Log-Differenced Index")
+
+# Optional: Add grid for clarity
+grid()
