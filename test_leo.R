@@ -144,31 +144,51 @@ par(mfrow = c(1, 1))
 plot(forecast_values, xlim = c(2020, max(time(forecast_values$mean))), main = "Forecast for t+1 and t+2", ylab = "Value", xlab = "Year")
 
 
-
-
 # Plotting the original series with confidence forecast
 
 forecast_values <- forecast(arma12_model, h = 2)
 
-# Reverse the log-difference transformations
+# Function to reverse log-differencing
 reverse_log_diff <- function(forecast_obj, last_value) {
   # Point forecasts
   point_fc <- numeric(length(forecast_obj$mean))
-  point_fc[1] <- last_value * exp(forecast_obj$mean[1])
-  point_fc[2] <- point_fc[1] * exp(forecast_obj$mean[2])
-  
+
+  # For the first forecast, we use the last original value and the first forecasted log-difference
+  # The formula to reverse the log-difference is: X_t = exp(Δlog(X_t) + log(X_{t-1}))
+  # Here, Δlog(X_t) is the forecasted mean log-difference, and X_{t-1} is the last original value
+  point_fc[1] <- exp(forecast_obj$mean[1] + log(last_value))
+
+  # For subsequent forecasts, we use the previous forecasted value to calculate the current value
+  # The same formula is applied iteratively: X_{t+i} = exp(Δlog(X_{t+i}) + log(X_{t+i-1}))
+  for (i in 2:length(forecast_obj$mean)) {
+    point_fc[i] <- exp(forecast_obj$mean[i] + log(point_fc[i-1]))
+  }
+
   # Lower CI (using the first confidence level)
   lower_fc <- numeric(length(forecast_obj$lower[,1]))
-  lower_fc[1] <- last_value * exp(forecast_obj$lower[1,1])
-  lower_fc[2] <- lower_fc[1] * exp(forecast_obj$lower[2,1])
-  
+
+  # For the first lower CI, we use the last original value and the first forecasted lower log-difference
+  lower_fc[1] <- exp(forecast_obj$lower[1,1] + log(last_value))
+
+  # For subsequent lower CIs, we use the previous lower CI value to calculate the current value
+  for (i in 2:length(forecast_obj$lower[,1])) {
+    lower_fc[i] <- exp(forecast_obj$lower[i,1] + log(lower_fc[i-1]))
+  }
+
   # Upper CI
   upper_fc <- numeric(length(forecast_obj$upper[,1]))
-  upper_fc[1] <- last_value * exp(forecast_obj$upper[1,1])
-  upper_fc[2] <- upper_fc[1] * exp(forecast_obj$upper[2,1])
-  
+
+  # For the first upper CI, we use the last original value and the first forecasted upper log-difference
+  upper_fc[1] <- exp(forecast_obj$upper[1,1] + log(last_value))
+
+  # For subsequent upper CIs, we use the previous upper CI value to calculate the current value
+  for (i in 2:length(forecast_obj$upper[,1])) {
+    upper_fc[i] <- exp(forecast_obj$upper[i,1] + log(upper_fc[i-1]))
+  }
+
   return(list(mean = point_fc, lower = lower_fc, upper = upper_fc))
 }
+
 
 last_original <- tail(ts_data, 1)  # Last value of original series
 print(last_original)
