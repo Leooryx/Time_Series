@@ -146,18 +146,11 @@ plot(forecast_values, xlim = c(2020, max(time(forecast_values$mean))), main = "F
 
 
 
+# Plotting the original series with confidence forecast
 
-#trying to represent the confidence interval on the original series
+forecast_values <- forecast(arma12_model, h = 2)
 
-
-# 1. Forecast on transformed data
-transformed_forecast <- forecast(arma12_model, h = 2)
-
-# 2. Reverse the log-difference transformations
-last_original <- tail(ts_data, 1)  # Last value of original series
-print(last_original)
-
-# Function to reverse log-differencing
+# Reverse the log-difference transformations
 reverse_log_diff <- function(forecast_obj, last_value) {
   # Point forecasts
   point_fc <- numeric(length(forecast_obj$mean))
@@ -177,22 +170,25 @@ reverse_log_diff <- function(forecast_obj, last_value) {
   return(list(mean = point_fc, lower = lower_fc, upper = upper_fc))
 }
 
-reversed <- reverse_log_diff(transformed_forecast, last_original)
+last_original <- tail(ts_data, 1)  # Last value of original series
+print(last_original)
+
+reversed <- reverse_log_diff(forecast_values, last_original)
 print(reversed)
 
-# 3. Create time series objects for the forecast period
+# Create time series objects for the forecast period
 fc_dates <- seq(end(ts_data), by = deltat(ts_data), length.out = 3)[-1]
 fc_series <- zoo(reversed$mean, fc_dates)
 lower_series <- zoo(reversed$lower, fc_dates)
 upper_series <- zoo(reversed$upper, fc_dates)
 
-# 4. Combine with original series
+# Combine with original series
 combined <- merge(ts_data = ts_data, 
                  forecast = fc_series, 
                  lower = lower_series, 
                  upper = upper_series)
 
-# 5. Enhanced plotting
+# Plotting everything
 plot(combined$ts_data, 
      main = "Original Series with Forecasts", 
      xlab = "Time", ylab = "Value",
@@ -200,7 +196,6 @@ plot(combined$ts_data,
      xlim = c(as.yearmon("2020-01"), end(ts_data)),
      lwd = 2)
 
-# Add forecast points
 lines(combined$forecast, col = "red", lwd = 2, type = "o", pch = 19)
 
 # Add confidence interval
